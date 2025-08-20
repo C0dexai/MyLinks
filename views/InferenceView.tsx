@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ApiEndpoint } from '../types';
 
@@ -12,6 +11,8 @@ const InferenceView: React.FC<InferenceViewProps> = ({ endpoints, onAddEndpoint,
     const [selectedEndpoint, setSelectedEndpoint] = useState('');
     const [url, setUrl] = useState('');
     const [token, setToken] = useState('');
+    const [apiName, setApiName] = useState('');
+    const [apiKey, setApiKey] = useState('');
     const [body, setBody] = useState('{}');
     const [response, setResponse] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +50,19 @@ const InferenceView: React.FC<InferenceViewProps> = ({ endpoints, onAddEndpoint,
                 parsedBody = JSON.parse(body);
             } catch (error) {
                 throw new Error('Invalid JSON in request body.');
+            }
+
+            // Inject environment variables if they are provided
+            const env: { [key: string]: string } = {};
+            if (apiName) {
+                env.API_NAME = apiName;
+            }
+            if (apiKey) {
+                env.API_KEY = apiKey;
+            }
+
+            if (Object.keys(env).length > 0) {
+                parsedBody.env = { ...parsedBody.env, ...env };
             }
 
             const res = await fetch(url, {
@@ -106,6 +120,14 @@ const InferenceView: React.FC<InferenceViewProps> = ({ endpoints, onAddEndpoint,
                      <div>
                         <label htmlFor="token" className="block mb-2 font-bold">Bearer Token</label>
                         <input type="text" id="token" value={token} onChange={e => setToken(e.target.value)} placeholder="Your API bearer token" required className="form-input w-full p-2" />
+                    </div>
+                    <div>
+                        <label htmlFor="apiName" className="block mb-2 font-bold">API_NAME (for container env)</label>
+                        <input type="text" id="apiName" value={apiName} onChange={(e) => setApiName(e.target.value)} placeholder="e.g., gemini-2.5-flash" className="form-input w-full p-2" />
+                    </div>
+                    <div>
+                        <label htmlFor="apiKey" className="block mb-2 font-bold">API_KEY (for container env)</label>
+                        <input type="password" id="apiKey" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="Key for service inside container" className="form-input w-full p-2" />
                     </div>
                     <div>
                         <label htmlFor="body" className="block mb-2 font-bold">Request Body (JSON)</label>
