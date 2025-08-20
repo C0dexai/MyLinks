@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-App SPA - Neon Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Define Neon Colors as CSS Variables */
+        :root {
+            --neon-blue: #00F0FF;   /* Cyan-like */
+            --neon-purple: #BF00FF;
+            --neon-green: #00FF8C;
+            --neon-pink: #FF00BF;
+            --card-bg: rgba(30, 30, 30, 0.8); /* Semi-transparent dark card background */
+            --border-color: #333; /* Darker border for contrast */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212; /* Very dark grey background */
+            color: #E0E0E0; /* Light grey text for contrast */
+            overflow: hidden; /* Prevent body scrollbars */
+        }
+
+        /* Form Input Focus Glow */
+        .form-input {
+            background-color: #282828; /* Slightly lighter dark grey for inputs */
+            border-color: var(--border-color);
+            color: #E0E0E0;
+            transition: all 0.2s ease-in-out;
+            border-radius: 0.5rem; /* Tailwind 'rounded-lg' */
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--neon-green);
+            box-shadow: 0 0 0 3px rgba(0, 255, 140, 0.3), 0 0 10px var(--neon-green); /* Neon green focus glow */
+        }
+
+        /* Modal Transitions */
+        .modal-backdrop { transition: opacity 0.3s ease-in-out; }
+        .modal-content { transition: transform 0.3s ease-in-out; }
+
+        /* Resizable Menu Handle */
+        #resize-handle {
+            width: 5px;
+            cursor: col-resize;
+            background-color: #4a5568; /* Dark grey for visibility */
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+        nav:hover #resize-handle { opacity: 1; }
+        .is-resizing { user-select: none; } /* Disable text selection during resize */
+
+        /* Tabs Styling */
+        .tab {
+            border-color: transparent; /* Default transparent border */
+            color: #A0A0A0; /* Lighter grey for inactive tabs */
+            transition: all 0.2s ease-in-out;
+            border-radius: 0.25rem 0.25rem 0 0; /* Rounded top corners */
+        }
+        .tab.active {
+            border-color: var(--neon-blue); /* Neon border for active tab */
+            background-color: var(--neon-blue); /* Neon background for active tab */
+            color: black !important; /* Black text for active tab to stand out */
+            font-weight: 600; /* Bolder text for active tab */
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.3); /* Subtle text shadow for depth */
+            box-shadow: 0 0 15px var(--neon-blue); /* Overall tab glow */
+        }
+        .tab:not(.active):hover {
+            color: var(--neon-blue); /* Neon color on hover for inactive tabs */
+            border-color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        /* Semi-Transparent Cards & Modals with Neon Borders */
+        .neon-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--neon-blue); /* Neon border */
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); /* Soft neon glow for cards */
+        }
+
+        /* Menu Link Styling */
+        .menu-entry {
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent; /* For hover effect */
+        }
+        .menu-entry:hover {
+            background-color: rgba(0, 240, 255, 0.2); /* Semi-transparent neon blue hover */
+            border-left: 3px solid var(--neon-blue);
+        }
+        .menu-entry:hover .link-text {
+            text-shadow: 0 0 8px var(--neon-blue); /* Text glow on hover */
+        }
+        
+        /* Heading Colors & Glow */
+        h1, h2, h3 {
+            color: var(--neon-blue); /* Neon blue for main headings */
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* Button Styling */
+        .btn-primary {
+            background-color: var(--neon-blue); /* Default button color */
+            color: black; /* Black text on neon buttons */
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+        .btn-primary:hover {
+            background-color: var(--neon-green); /* Hover effect to another neon color */
+            box-shadow: 0 0 15px rgba(0, 255, 140, 0.7);
+        }
+        .btn-danger {
+            background-color: var(--neon-pink); /* Delete button in pink neon */
+            color: black;
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(255, 0, 191, 0.5);
+        }
+        .btn-danger:hover {
+            background-color: #FF55CC; /* Slightly brighter pink on hover */
+            box-shadow: 0 0 15px rgba(255, 0, 191, 0.7);
+        }
+        .btn-secondary { /* Cancel button */
+            background-color: #444;
+            color: #E0E0E0;
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background-color: #555;
+        }
+
+        /* Scrollbar Styles - Tiny White Neon Phosphor Glow */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Glowing Orb Animation */
+        @keyframes neon-pulse {
+            0% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue); }
+            25% { box-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple), 0 0 30px var(--neon-purple); }
+            50% { box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
+            75% { box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink), 0 0 30px var(--neon-pink); }
+            100% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue); }
+        }
+        #glowing-orb {
+            border: 2px solid transparent;
+            animation: neon-pulse 4s infinite alternate;
+        }
+
+        /* Submenu Styling */
+        #quick-goto-submenu {
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            background-color: var(--card-bg);
+        }
+
+        /* AI Console specific styles */
+        #ai-console-view h1, #inference-view h1 {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+        #ai-console-view input, #ai-console-view textarea, #ai-console-view select, #inference-view input, #inference-view textarea, #inference-view select {
+            background: #222 !important;
+            color: var(--neon-green) !important;
+            border: 1px solid var(--neon-green) !important;
+            box-shadow: 0 0 5px rgba(0, 255, 140, 0.3);
+        }
+        #ai-console-view button, #inference-view button {
+            background: var(--neon-blue) !important;
+            color: black !important;
+        }
+        #ai-console-view button:hover, #inference-view button:hover {
+            background: var(--neon-green) !important;
+        }
+        #ai-console-view pre, #inference-view pre {
+            background: #000 !important;
+            color: var(--neon-green) !important;
+            border: 1px solid var(--neon-green) !important;
+            box-shadow: 0 0 10px rgba(0, 255, 140, 0.5);
+        }
+        #ai-console-view label, #inference-view label {
+            color: var(--neon-blue) !important;
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        /* Instruction Panel Styles */
+        #instruction-panel {
+            background-color: var(--card-bg);
+            border-left: 1px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "react": "https://esm.sh/react@^19.1.1"
+  }
+}
+</script>
+</head>
+<body class="bg-gray-900 text-gray-200">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "name": "Multi-App SPA - Neon Edition",
+  "description": "A versatile single-page application with a neon aesthetic, featuring tools for link management, a to-do list, a markdown notepad, and an API inference console.",
+  "requestFramePermissions": []
+}
