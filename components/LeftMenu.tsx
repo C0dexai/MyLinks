@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, View } from '../types';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { Link } from '../types';
 
 interface LeftMenuProps {
     links: Link[];
-    onSwitchView: (view: View, url?: string) => void;
+    onLinkNavigate: (link: Link) => void;
     onEdit: (id: number) => void;
     onDelete: (id: number) => void;
 }
@@ -12,14 +12,17 @@ interface LeftMenuProps {
 const icons = {
     collapse: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>,
     expand: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>,
-    home: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
     edit: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>,
     delete: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>,
+    book: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>,
+    code: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>,
 };
 
-const LeftMenu: React.FC<LeftMenuProps> = ({ links, onSwitchView, onEdit, onDelete }) => {
+const LeftMenu: React.FC<LeftMenuProps> = ({ links, onLinkNavigate, onEdit, onDelete }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [width, setWidth] = useState(256);
+    const [isInformativeOpen, setInformativeOpen] = useState(true);
+    const [isDevelopmentOpen, setDevelopmentOpen] = useState(true);
     const navRef = useRef<HTMLElement>(null);
     const isResizing = useRef(false);
 
@@ -72,13 +75,28 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ links, onSwitchView, onEdit, onDele
         };
     }, [handleMouseMove, handleMouseUp]);
 
-    const homeLink: Link = { id: 0, description: "Home", url: "#", isHome: true };
+    const { informativeLinks, developmentLinks } = useMemo(() => ({
+        informativeLinks: links.filter(l => l.category === 'informative'),
+        developmentLinks: links.filter(l => l.category === 'development')
+    }), [links]);
 
-    const iconNavItems = [
-        { view: View.AddLink, icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>, label: 'Home' },
-        { view: View.Pages, icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>, label: 'Internet' },
-        { view: View.Connect, icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5.52 19c.64-2.2 1.84-3 3.22-3h6.52c1.38 0 2.58.8 3.22 3"/><circle cx="12" cy="10" r="3"/><path d="M12 2a10 10 0 0 0-9 12.87V22h18v-7.13A10 10 0 0 0 12 2z"/></svg>, label: 'Connect' }
-    ];
+    const renderLinkRow = (link: Link) => (
+        <div key={link.id} className="menu-entry flex items-center p-2 rounded-md group justify-between">
+            <a
+                href="#"
+                onClick={(e) => { e.preventDefault(); onLinkNavigate(link); }}
+                title={link.description}
+                className="flex items-center overflow-hidden flex-grow cursor-pointer"
+            >
+                <img src={link.imageUrl || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='} alt={link.description} className="flex-shrink-0 w-8 h-8 object-cover rounded-md bg-gray-700" />
+                <span className="link-text font-medium whitespace-nowrap overflow-hidden ml-3 text-gray-200">{link.description}</span>
+            </a>
+            <div className="flex items-center space-x-1 flex-shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={() => onEdit(link.id)} className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-gray-600">{icons.edit}</button>
+                <button onClick={() => onDelete(link.id)} className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-gray-600">{icons.delete}</button>
+            </div>
+        </div>
+    );
 
     return (
         <nav
@@ -93,39 +111,47 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ links, onSwitchView, onEdit, onDele
                 </button>
             </div>
             
-            <div className="grid grid-cols-3 gap-2 mb-4 pb-4 border-b border-gray-700">
-                {iconNavItems.map(item => (
-                    <button key={item.view} onClick={() => onSwitchView(item.view)} className="flex flex-col items-center justify-center aspect-square bg-[rgba(30,30,30,0.8)] border border-[#00F0FF] rounded-lg shadow-[0_0_10px_rgba(0,240,255,0.3)] transition-all duration-200 hover:bg-[rgba(0,240,255,0.2)] hover:border-[#00FF8C] hover:shadow-[0_0_15px_rgba(0,255,140,0.5)]">
-                        <div className="text-[#00F0FF] filter drop-shadow-[0_0_5px_var(--neon-blue)]">{item.icon}</div>
-                        {!isCollapsed && <span className="text-xs font-medium text-gray-400 mt-1">{item.label}</span>}
-                    </button>
-                ))}
-            </div>
-
             <div className="flex-grow overflow-y-auto space-y-2">
-                {[homeLink, ...links].map(link => (
-                    <div key={link.id} className={`menu-entry flex items-center p-2 rounded-md ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+                {isCollapsed ? (
+                    links.map(link => (
                         <a
+                            key={link.id}
                             href="#"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                onSwitchView(link.isHome ? View.AddLink : View.Iframe, link.url);
-                            }}
-                            className="flex items-center overflow-hidden flex-grow cursor-pointer"
+                            onClick={(e) => { e.preventDefault(); onLinkNavigate(link); }}
+                            title={link.description}
+                            className="flex items-center justify-center p-1 rounded-md cursor-pointer menu-entry"
                         >
-                            <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm text-black ${link.isHome ? 'bg-[#00FF8C] shadow-[0_0_8px_var(--neon-green)]' : 'bg-[#BF00FF] shadow-[0_0_8px_var(--neon-purple)]'}`}>
-                                {link.isHome ? icons.home : link.description.charAt(0).toUpperCase()}
-                            </div>
-                            {!isCollapsed && <span className="link-text font-medium whitespace-nowrap overflow-hidden ml-3 text-gray-200">{link.description}</span>}
+                            <img src={link.imageUrl || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='} alt={link.description} className="w-10 h-10 object-cover rounded-md bg-gray-700" />
                         </a>
-                        {!link.isHome && !isCollapsed && (
-                            <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
-                                <button onClick={() => onEdit(link.id)} className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-gray-600">{icons.edit}</button>
-                                <button onClick={() => onDelete(link.id)} className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-gray-600">{icons.delete}</button>
+                    ))
+                ) : (
+                    <>
+                        {informativeLinks.length > 0 && (
+                            <div>
+                                <button onClick={() => setInformativeOpen(!isInformativeOpen)} className="w-full flex items-center justify-between p-2 rounded-md hover:bg-gray-700 text-gray-300">
+                                    <div className="flex items-center gap-2">
+                                        {icons.book}
+                                        <h3 className="font-bold text-sm">Informative</h3>
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-200 ${isInformativeOpen ? 'rotate-180' : ''}`}><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                                {isInformativeOpen && <div className="mt-1 space-y-1 pl-2 border-l-2 border-gray-700">{informativeLinks.map(renderLinkRow)}</div>}
                             </div>
                         )}
-                    </div>
-                ))}
+                         {developmentLinks.length > 0 && (
+                            <div className="mt-2">
+                                <button onClick={() => setDevelopmentOpen(!isDevelopmentOpen)} className="w-full flex items-center justify-between p-2 rounded-md hover:bg-gray-700 text-gray-300">
+                                    <div className="flex items-center gap-2">
+                                        {icons.code}
+                                        <h3 className="font-bold text-sm">Development</h3>
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-200 ${isDevelopmentOpen ? 'rotate-180' : ''}`}><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                                {isDevelopmentOpen && <div className="mt-1 space-y-1 pl-2 border-l-2 border-gray-700">{developmentLinks.map(renderLinkRow)}</div>}
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
             <div id="resize-handle" onMouseDown={handleMouseDown}></div>
         </nav>

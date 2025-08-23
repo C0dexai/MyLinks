@@ -7,5 +7,6 @@ export const STORE_NAMES = {
     todos: 'todos',
     notepad: 'notepad',
     instructions: 'instructions',
-    endpoints: 'endpoints'
+    endpoints: 'endpoints',
+    openai_config: 'openai_config'
 };

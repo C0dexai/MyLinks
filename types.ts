@@ -4,12 +4,16 @@ export interface Link {
     description: string;
     url: string;
     isHome?: boolean;
+    imageUrl?: string;
+    visitCount?: number;
+    rating?: number; // 0 to 5
+    category: 'informative' | 'development';
 }
 
 export interface Todo {
     id: number;
     text: string;
-    completed: boolean;
+    status: 'todo' | 'in-progress' | 'done';
 }
 
 export interface ApiEndpoint {
@@ -29,6 +33,11 @@ export interface Instruction {
     ai: string;
 }
 
+export interface OpenAiConfig {
+    id: number;
+    apiKey: string;
+}
+
 export enum View {
     AddLink = 'add-link-view',
     Pages = 'pages-view',
@@ -38,4 +47,5 @@ export enum View {
     AIConsole = 'ai-console-view',
     Connect = 'connect-view',
     Inference = 'inference-view',
+    Rankings = 'rankings-view',
 }

@@ -1,3 +1,13 @@
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "react": "https://esm.sh/react@^19.1.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "@google/genai": "https://esm.sh/@google/genai"
+  }
+}
+</script>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,8 +18,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
     <style>
         /* Define Neon Colors as CSS Variables */
         :root {
@@ -131,101 +143,45 @@
             background-color: #FF55CC; /* Slightly brighter pink on hover */
             box-shadow: 0 0 15px rgba(255, 0, 191, 0.7);
         }
-        .btn-secondary { /* Cancel button */
-            background-color: #444;
+        
+        .btn-secondary {
+            background-color: #4A5568;
             color: #E0E0E0;
-            box-shadow: none;
+            transition: background-color 0.2s ease-in-out;
         }
         .btn-secondary:hover {
-            background-color: #555;
+            background-color: #64748b;
         }
-
-        /* Scrollbar Styles - Tiny White Neon Phosphor Glow */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-        }
-
-        /* Glowing Orb Animation */
-        @keyframes neon-pulse {
-            0% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue); }
-            25% { box-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple), 0 0 30px var(--neon-purple); }
-            50% { box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
-            75% { box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink), 0 0 30px var(--neon-pink); }
-            100% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue); }
-        }
+        
+        /* Quick Goto Orb */
         #glowing-orb {
-            border: 2px solid transparent;
-            animation: neon-pulse 4s infinite alternate;
+            background: radial-gradient(circle, #00F0FF, #121212 60%);
+            box-shadow: 0 0 15px #00F0FF, 0 0 30px #00F0FF, inset 0 0 10px #00F0FF;
+            animation: orb-pulse 2s infinite alternate;
+        }
+        @keyframes orb-pulse {
+          from { transform: scale(1); box-shadow: 0 0 15px #00F0FF, 0 0 30px #00F0FF, inset 0 0 10px #00F0FF; }
+          to { transform: scale(1.05); box-shadow: 0 0 25px #BF00FF, 0 0 50px #BF00FF, inset 0 0 15px #BF00FF; }
         }
 
-        /* Submenu Styling */
         #quick-goto-submenu {
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background-color: rgba(30, 30, 30, 0.9);
             border: 1px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
-            background-color: var(--card-bg);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
         }
 
-        /* AI Console specific styles */
-        #ai-console-view h1, #inference-view h1 {
-            color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green);
-        }
-        #ai-console-view input, #ai-console-view textarea, #ai-console-view select, #inference-view input, #inference-view textarea, #inference-view select {
-            background: #222 !important;
-            color: var(--neon-green) !important;
-            border: 1px solid var(--neon-green) !important;
-            box-shadow: 0 0 5px rgba(0, 255, 140, 0.3);
-        }
-        #ai-console-view button, #inference-view button {
-            background: var(--neon-blue) !important;
-            color: black !important;
-        }
-        #ai-console-view button:hover, #inference-view button:hover {
-            background: var(--neon-green) !important;
-        }
-        #ai-console-view pre, #inference-view pre {
-            background: #000 !important;
-            color: var(--neon-green) !important;
-            border: 1px solid var(--neon-green) !important;
-            box-shadow: 0 0 10px rgba(0, 255, 140, 0.5);
-        }
-        #ai-console-view label, #inference-view label {
-            color: var(--neon-blue) !important;
-            text-shadow: 0 0 5px var(--neon-blue);
-        }
-
-        /* Instruction Panel Styles */
+        /* Instruction Panel */
         #instruction-panel {
-            background-color: var(--card-bg);
-            border-left: 1px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            background-color: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid var(--neon-pink);
+            box-shadow: -10px 0 20px rgba(255, 0, 191, 0.2);
         }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
-    "react/": "https://esm.sh/react@^19.1.1/",
-    "react": "https://esm.sh/react@^19.1.1"
-  }
-}
-</script>
 </head>
-<body class="bg-gray-900 text-gray-200">
+<body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>
