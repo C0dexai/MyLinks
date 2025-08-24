@@ -1,16 +1,18 @@
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Instruction, OpenAiConfig } from '../types';
 
 interface InstructionPanelProps {
+    isOpen: boolean;
+    onClose: () => void;
     instructions: Instruction | undefined;
     onUpdateInstructions: (instructions: Instruction) => void;
     openAiConfig: OpenAiConfig | undefined;
     onUpdateOpenAiConfig: (config: OpenAiConfig) => void;
 }
 
-const InstructionPanel: React.FC<InstructionPanelProps> = ({ instructions, onUpdateInstructions, openAiConfig, onUpdateOpenAiConfig }) => {
-    const [isOpen, setIsOpen] = useState(false);
+const InstructionPanel: React.FC<InstructionPanelProps> = ({ isOpen, onClose, instructions, onUpdateInstructions, openAiConfig, onUpdateOpenAiConfig }) => {
     const [systemInstruction, setSystemInstruction] = useState('');
     const [aiInstruction, setAiInstruction] = useState('');
     const [openAiApiKey, setOpenAiApiKey] = useState('');
@@ -56,57 +58,48 @@ const InstructionPanel: React.FC<InstructionPanelProps> = ({ instructions, onUpd
 
 
     return (
-        <>
-            <button
-                onClick={() => setIsOpen(true)}
-                className="fixed bottom-28 right-8 w-12 h-12 rounded-full flex items-center justify-center text-white text-2xl z-50 focus:outline-none bg-[#BF00FF] shadow-[0_0_15px_rgba(191,0,255,0.5)] transition-all hover:bg-[#A000E0] hover:shadow-[0_0_20px_rgba(191,0,255,0.7)]"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.51-1H5a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0 .33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H12a1.65 1.65 0 0 0 1.51-1V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V12a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            </button>
-            <div
-                id="instruction-panel"
-                className={`fixed top-0 right-0 h-full w-96 shadow-lg transition-transform duration-300 z-40 p-4 flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
-            >
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-[#FF00BF] text-shadow-[0_0_10px_var(--neon-pink)]">Custom Instructions & Keys</h2>
-                    <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+        <div
+            className={`fixed top-0 right-0 h-full w-96 transition-transform duration-300 z-40 p-4 flex flex-col glass neon ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Custom Instructions & Keys</h2>
+                <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <div className="flex-grow overflow-y-auto pr-2">
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-400 mb-1">OpenAI API Key:</label>
+                    <div className="relative">
+                        <input 
+                            type={isKeyVisible ? 'text' : 'password'}
+                            value={openAiApiKey} 
+                            onChange={(e) => setOpenAiApiKey(e.target.value)}
+                            placeholder="sk-..."
+                            className="form-input w-full pr-10"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setIsKeyVisible(!isKeyVisible)}
+                            className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-white"
+                        >
+                            {isKeyVisible ? 
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> :
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                            }
+                        </button>
+                    </div>
                 </div>
-                <div className="flex-grow overflow-y-auto pr-2">
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-400 mb-1">OpenAI API Key:</label>
-                        <div className="relative">
-                            <input 
-                                type={isKeyVisible ? 'text' : 'password'}
-                                value={openAiApiKey} 
-                                onChange={(e) => setOpenAiApiKey(e.target.value)}
-                                placeholder="sk-..."
-                                className="form-input w-full pr-10 bg-[#282828] border-[#00FF8C] text-[#00FF8C] shadow-[0_0_5px_rgba(0,255,140,0.3)]"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setIsKeyVisible(!isKeyVisible)}
-                                className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-white"
-                            >
-                                {isKeyVisible ? 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> :
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                                }
-                            </button>
-                        </div>
-                    </div>
 
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-400 mb-1">System Orchestrator Instruction:</label>
-                        <textarea value={systemInstruction} onChange={(e) => setSystemInstruction(e.target.value)} className="form-input w-full h-40 resize-none bg-[#282828] border-[#00FF8C] text-[#00FF8C] shadow-[0_0_5px_rgba(0,255,140,0.3)]"></textarea>
-                    </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-400 mb-1">System Orchestrator Instruction:</label>
+                    <textarea value={systemInstruction} onChange={(e) => setSystemInstruction(e.target.value)} className="form-input w-full h-40 resize-none"></textarea>
+                </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">AI Supervisor Instruction:</label>
-                        <textarea value={aiInstruction} onChange={(e) => setAiInstruction(e.target.value)} className="form-input w-full h-40 resize-none bg-[#282828] border-[#00FF8C] text-[#00FF8C] shadow-[0_0_5px_rgba(0,255,140,0.3)]"></textarea>
-                    </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">AI Supervisor Instruction:</label>
+                    <textarea value={aiInstruction} onChange={(e) => setAiInstruction(e.target.value)} className="form-input w-full h-40 resize-none"></textarea>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

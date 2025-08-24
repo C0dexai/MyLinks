@@ -64,7 +64,7 @@ const MonacoEditor: React.FC<MonacoEditorProps> = ({
         }
     }, [language]);
 
-    return <div ref={editorRef} className="w-full h-full border border-gray-700 rounded-lg"></div>;
+    return <div ref={editorRef} className="w-full h-full rounded-lg overflow-hidden"></div>;
 };
 
 export default MonacoEditor;

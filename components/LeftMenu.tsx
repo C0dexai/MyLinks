@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from '../types';
 
@@ -101,8 +102,8 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ links, onLinkNavigate, onEdit, onDe
     return (
         <nav
             ref={navRef}
-            className="bg-gray-800 text-white p-4 flex flex-col flex-shrink-0 shadow-lg h-screen relative"
-            style={{ width: isCollapsed ? '80px' : `${width}px`, transition: isResizing.current ? 'none' : 'width 0.3s ease-in-out' }}
+            className="glass text-white p-4 flex flex-col flex-shrink-0 h-screen relative"
+            style={{ width: isCollapsed ? '80px' : `${width}px`, transition: isResizing.current ? 'none' : 'width 0.3s ease-in-out', background: 'rgba(var(--glass-bg-rgb), .15)' }}
         >
             <div className="flex items-center justify-between mb-4">
                 {!isCollapsed && <h2 className="text-xl font-bold whitespace-nowrap text-gray-200" style={{ textShadow: 'none' }}>My Links</h2>}

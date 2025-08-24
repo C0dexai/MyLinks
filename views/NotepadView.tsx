@@ -154,19 +154,19 @@ const NotepadView: React.FC<NotepadViewProps> = ({ notepad, onUpdateNotepad }) =
 
 
     return (
-        <div className="w-full h-full flex flex-col p-4 bg-gray-900 gap-4">
+        <div className="w-full h-full flex flex-col p-4 gap-4">
             {/* Controls Bar */}
-            <div className="flex-shrink-0 neon-card p-3 rounded-lg flex flex-wrap items-center gap-4 text-sm">
+            <div className="flex-shrink-0 glass neon p-3 flex flex-wrap items-center gap-4 text-sm">
                 {/* File Operations */}
                 <div className="flex items-center gap-2">
                      <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".md,.html,.htm,.txt,.text" className="hidden" />
-                     <button onClick={() => fileInputRef.current?.click()} className="btn-primary px-3 py-1.5 rounded-md">Load File</button>
+                     <button onClick={() => fileInputRef.current?.click()} className="btn-primary px-3 py-1.5">Load File</button>
                 </div>
 
                 {/* Fetch from URL */}
                  <div className="flex items-center gap-2 flex-grow min-w-[200px]">
                     <input type="url" value={fetchUrl} onChange={(e) => setFetchUrl(e.target.value)} placeholder="Fetch content from URL..." className="form-input flex-grow p-1.5" />
-                    <button onClick={handleFetch} disabled={isLoading} className="btn-primary px-3 py-1.5 rounded-md disabled:opacity-50">
+                    <button onClick={handleFetch} disabled={isLoading} className="btn-primary px-3 py-1.5 disabled:opacity-50">
                         {isLoading ? 'Fetching...' : 'Fetch'}
                     </button>
                 </div>
@@ -189,7 +189,7 @@ const NotepadView: React.FC<NotepadViewProps> = ({ notepad, onUpdateNotepad }) =
                             <option value="plaintext">Plain Text</option>
                         </select>
                     </div>
-                    <button onClick={handleDownload} className="btn-primary px-3 py-1.5 rounded-md">Download</button>
+                    <button onClick={handleDownload} className="btn-primary px-3 py-1.5">Download</button>
                 </div>
             </div>
              {error && <div className="text-red-500 bg-red-900/50 p-2 rounded-md flex-shrink-0">{error}</div>}
@@ -198,7 +198,7 @@ const NotepadView: React.FC<NotepadViewProps> = ({ notepad, onUpdateNotepad }) =
             <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
                 <div className="flex flex-col min-h-0">
                     <h2 className="text-lg font-semibold mb-2 text-gray-300">Editor</h2>
-                    <div className="flex-grow min-h-0">
+                    <div className="flex-grow min-h-0 glass">
                         <MonacoEditor
                             value={content}
                             onChange={setContent}
@@ -208,7 +208,7 @@ const NotepadView: React.FC<NotepadViewProps> = ({ notepad, onUpdateNotepad }) =
                 </div>
                 <div className="flex flex-col min-h-0">
                      <h2 className="text-lg font-semibold mb-2 text-gray-300">Live Preview</h2>
-                     <div className="flex-grow bg-gray-800 p-4 rounded-lg border border-gray-700 overflow-y-auto prose prose-invert max-w-none">
+                     <div className="flex-grow glass p-4 overflow-y-auto prose prose-invert max-w-none">
                         {inputFormat === 'html' ? (
                              <iframe src={previewContent} title="HTML Preview" className="w-full h-full border-0 bg-transparent" sandbox=""></iframe>
                         ) : inputFormat === 'plaintext' ? (

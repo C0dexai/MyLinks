@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { DB_NAME, DB_VERSION, STORE_NAMES } from '../constants';
 
@@ -52,6 +53,11 @@ const getDb = (): Promise<IDBDatabase> => {
                 if (!db.objectStoreNames.contains(STORE_NAMES.openai_config)) {
                     const store = db.createObjectStore(STORE_NAMES.openai_config, { keyPath: 'id' });
                     store.add({ id: 1, apiKey: '' });
+                }
+
+                // Images Store
+                if (!db.objectStoreNames.contains(STORE_NAMES.images)) {
+                    db.createObjectStore(STORE_NAMES.images, { keyPath: 'id', autoIncrement: true });
                 }
             };
 

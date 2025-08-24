@@ -17,10 +17,10 @@ const Modal: React.FC<ModalProps> = ({ title, isOpen, onClose, children }) => {
             onClick={onClose}
         >
             <div 
-                className="modal-content bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md m-4 transform scale-100 border-2 border-[#BF00FF] shadow-[0_0_25px_rgba(191,0,255,0.5)]"
+                className="modal-content glass neon p-8 w-full max-w-md m-4 transform scale-100"
                 onClick={e => e.stopPropagation()}
             >
-                <h2 className="text-2xl font-bold mb-4 text-[#BF00FF]">{title}</h2>
+                <h2 className="text-2xl font-bold mb-4">{title}</h2>
                 {children}
             </div>
         </div>

@@ -56,7 +56,7 @@ const AddLinkView: React.FC<AddLinkViewProps> = ({ onAddLink }) => {
 
     return (
         <div className="w-full h-full p-6 md:p-10 flex items-center justify-center">
-            <div className="max-w-2xl w-full neon-card p-8 rounded-xl">
+            <div className="max-w-2xl w-full glass neon p-8">
                 <h1 className="text-3xl font-bold">Add a New Link</h1>
                 <form onSubmit={handleSubmit} className="space-y-6 mt-6">
                     <div className="flex items-stretch gap-2">
@@ -66,14 +66,14 @@ const AddLinkView: React.FC<AddLinkViewProps> = ({ onAddLink }) => {
                             onChange={(e) => setUrl(e.target.value)}
                             placeholder="URL"
                             required
-                            className="form-input flex-grow w-full p-3 border rounded bg-gray-700 border-gray-600 text-white"
+                            className="form-input flex-grow w-full p-3"
                         />
                         <button
                             type="button"
                             onClick={handleGenerateDetails}
                             disabled={isGenerating || !url}
                             title="Generate Details from URL"
-                            className="btn-secondary px-4 rounded-lg flex items-center justify-center disabled:opacity-50"
+                            className="btn-secondary px-4 flex items-center justify-center disabled:opacity-50"
                         >
                             {isGenerating ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -88,14 +88,14 @@ const AddLinkView: React.FC<AddLinkViewProps> = ({ onAddLink }) => {
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Description"
                         required
-                        className="form-input w-full p-3 border rounded bg-gray-700 border-gray-600 text-white"
+                        className="form-input w-full p-3"
                     />
                     <input
                         type="url"
                         value={imageUrl}
                         onChange={(e) => setImageUrl(e.target.value)}
                         placeholder="Image URL (Snapshot)"
-                        className="form-input w-full p-3 border rounded bg-gray-700 border-gray-600 text-white"
+                        className="form-input w-full p-3"
                     />
                      <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-400">Category</label>
@@ -124,7 +124,7 @@ const AddLinkView: React.FC<AddLinkViewProps> = ({ onAddLink }) => {
                             </label>
                         </div>
                     </div>
-                    <button type="submit" className="w-full btn-primary text-white font-semibold py-3 px-4 rounded-lg">
+                    <button type="submit" className="w-full btn-primary text-white font-semibold py-3 px-4">
                         Add Link
                     </button>
                 </form>

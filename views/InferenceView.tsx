@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ApiEndpoint } from '../types';
 
@@ -89,7 +90,7 @@ const InferenceView: React.FC<InferenceViewProps> = ({ endpoints, onAddEndpoint,
     
     return (
         <div id="inference-view" className="w-full h-full p-6 md:p-10 flex items-center justify-center">
-            <div className="max-w-4xl w-full neon-card p-8 rounded-xl">
+            <div className="max-w-4xl w-full glass neon p-8">
                 <h1 className="text-3xl font-bold">🚀 API Inference Console</h1>
                 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -100,14 +101,14 @@ const InferenceView: React.FC<InferenceViewProps> = ({ endpoints, onAddEndpoint,
                                 <option value="">Select an endpoint</option>
                                 {endpoints.map(ep => <option key={ep.id} value={ep.id}>{ep.name}</option>)}
                             </select>
-                            <button onClick={handleDeleteEndpoint} disabled={!selectedEndpoint} className="btn-danger p-2 rounded-lg disabled:opacity-50">Delete</button>
+                            <button onClick={handleDeleteEndpoint} disabled={!selectedEndpoint} className="btn-danger p-2 disabled:opacity-50">Delete</button>
                         </div>
                     </div>
                      <div>
                         <label className="block mb-2 font-bold">Save New Endpoint</label>
                         <div className="flex gap-2">
                             <input type="text" value={newEndpointName} onChange={(e) => setNewEndpointName(e.target.value)} placeholder="New Endpoint Name" className="form-input w-full p-2" />
-                            <button onClick={handleSaveEndpoint} disabled={!newEndpointName.trim() || !url.trim()} className="btn-primary p-2 rounded-lg disabled:opacity-50">Save</button>
+                            <button onClick={handleSaveEndpoint} disabled={!newEndpointName.trim() || !url.trim()} className="btn-primary p-2 disabled:opacity-50">Save</button>
                         </div>
                     </div>
                 </div>
@@ -133,14 +134,14 @@ const InferenceView: React.FC<InferenceViewProps> = ({ endpoints, onAddEndpoint,
                         <label htmlFor="body" className="block mb-2 font-bold">Request Body (JSON)</label>
                         <textarea id="body" value={body} onChange={e => setBody(e.target.value)} rows={8} className="form-input w-full p-2 font-mono text-sm"></textarea>
                     </div>
-                    <button type="submit" disabled={isLoading} className="w-full btn-primary font-semibold py-3 px-4 rounded-lg disabled:opacity-50">
+                    <button type="submit" disabled={isLoading} className="w-full btn-primary font-semibold py-3 px-4 disabled:opacity-50">
                         {isLoading ? 'Sending...' : 'Send Request'}
                     </button>
                 </form>
 
                 <div className="mt-6">
                     <label className="block mb-2 font-bold">Response</label>
-                    <pre className="h-48 p-3 rounded-lg overflow-y-auto text-sm font-mono">{response || '// API response will appear here...'}</pre>
+                    <pre className="h-48 p-3 rounded-lg overflow-y-auto text-sm font-mono form-input">{response || '// API response will appear here...'}</pre>
                 </div>
             </div>
         </div>

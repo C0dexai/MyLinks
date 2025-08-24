@@ -38,6 +38,12 @@ export interface OpenAiConfig {
     apiKey: string;
 }
 
+export interface StoredImage {
+    id: number;
+    name: string;
+    dataUrl: string;
+}
+
 export enum View {
     AddLink = 'add-link-view',
     Pages = 'pages-view',

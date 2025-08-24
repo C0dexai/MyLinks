@@ -52,16 +52,16 @@ const ModelResponseCard: React.FC<{ title: string; content: string; error?: stri
     };
 
     return (
-        <div className="bg-gray-700 rounded-2xl flex flex-col w-full">
-            <div className="flex justify-between items-center px-4 py-2 border-b border-gray-600">
+        <div className="glass glass-subtle rounded-2xl flex flex-col w-full">
+            <div className="flex justify-between items-center px-4 py-2 border-b border-[rgba(255,255,255,.15)]">
                 <div className="flex items-center gap-2 font-bold text-gray-300">
                     {logo} {title}
                 </div>
                 <div className="flex items-center gap-2">
-                    <button onClick={handleCopy} title="Copy Content" className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-600 rounded-md transition-colors">
+                    <button onClick={handleCopy} title="Copy Content" className="p-1.5 text-gray-400 hover:text-white hover:bg-[rgba(255,255,255,.1)] rounded-md transition-colors">
                         {copySuccess ? <span>{copySuccess}</span> : <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>}
                     </button>
-                    <button title="Bookmark (Feature coming soon)" className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-600 rounded-md transition-colors cursor-not-allowed">
+                    <button title="Bookmark (Feature coming soon)" className="p-1.5 text-gray-400 hover:text-white hover:bg-[rgba(255,255,255,.1)] rounded-md transition-colors cursor-not-allowed">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
                     </button>
                 </div>
@@ -206,14 +206,14 @@ Engage in a helpful, conversational manner. Leverage the application context pro
 
     return (
         <div className="w-full h-full flex flex-col p-4 sm:p-6 md:p-8">
-            <div className="w-full h-full flex flex-col neon-card p-4 sm:p-6 rounded-xl overflow-hidden">
-                <h1 className="text-2xl sm:text-3xl font-bold flex-shrink-0 pb-4 border-b border-gray-700">Dual LLM Inference</h1>
+            <div className="w-full h-full flex flex-col glass neon p-4 sm:p-6 overflow-hidden">
+                <h1 className="text-2xl sm:text-3xl font-bold flex-shrink-0 pb-4 border-b border-[rgba(255,255,255,.15)]">Dual LLM Inference</h1>
                 <div className="flex-grow overflow-y-auto py-4 pr-2 sm:pr-4 space-y-6">
                     {turns.map((turn) => (
                         <div key={turn.id} className="space-y-4">
                             {/* User Message */}
                             <div className="flex items-start gap-3 justify-end">
-                                <div className="max-w-md lg:max-w-2xl px-4 py-3 rounded-2xl bg-[rgba(0,240,255,0.2)] text-white rounded-br-none">
+                                <div className="max-w-md lg:max-w-2xl px-4 py-3 rounded-2xl bg-[rgba(0,229,255,0.2)] text-white rounded-br-none">
                                     <p>{turn.user}</p>
                                 </div>
                                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-neon-blue to-neon-green flex items-center justify-center text-black font-bold shadow-[0_0_10px_var(--neon-blue)]">
@@ -236,7 +236,7 @@ Engage in a helpful, conversational manner. Leverage the application context pro
                     )}
                     <div ref={messagesEndRef} />
                 </div>
-                <form onSubmit={handleSendMessage} className="flex-shrink-0 flex items-center gap-2 sm:gap-4 pt-4 border-t border-gray-700">
+                <form onSubmit={handleSendMessage} className="flex-shrink-0 flex items-center gap-2 sm:gap-4 pt-4 border-t border-[rgba(255,255,255,.15)]">
                     <input
                         type="text"
                         value={userInput}
@@ -245,7 +245,7 @@ Engage in a helpful, conversational manner. Leverage the application context pro
                         className="form-input flex-grow p-3"
                         disabled={isLoading}
                     />
-                    <button type="submit" className="btn-primary p-3 rounded-lg disabled:opacity-50" disabled={isLoading || !userInput.trim()}>
+                    <button type="submit" className="btn-primary p-3 disabled:opacity-50" disabled={isLoading || !userInput.trim()}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
                 </form>

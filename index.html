@@ -18,165 +18,153 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
     <style>
-        /* Define Neon Colors as CSS Variables */
-        :root {
-            --neon-blue: #00F0FF;   /* Cyan-like */
-            --neon-purple: #BF00FF;
-            --neon-green: #00FF8C;
-            --neon-pink: #FF00BF;
-            --card-bg: rgba(30, 30, 30, 0.8); /* Semi-transparent dark card background */
-            --border-color: #333; /* Darker border for contrast */
-        }
+        /* === Glassmorphism Theme Core ============================ */
+        :root{
+          --glass-bg-rgb: 24, 24, 28;
+          --glass-alpha: .28;
+          --glass-blur: 18px;
+          --neon-a: 255,0,200; /* pink */
+          --neon-b: 0,229,255; /* cyan */
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #121212; /* Very dark grey background */
-            color: #E0E0E0; /* Light grey text for contrast */
-            overflow: hidden; /* Prevent body scrollbars */
+          /* Mapped for compatibility */
+          --neon-blue: rgb(var(--neon-b));
+          --neon-purple: rgb(var(--neon-a));
+          --neon-green: #00FF8C;
+          --neon-pink: rgb(var(--neon-a));
         }
+        .glass{ 
+          background: rgba(var(--glass-bg-rgb), var(--glass-alpha));
+          backdrop-filter: blur(var(--glass-blur)) saturate(120%);
+          -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(120%);
+          border: 1px solid rgba(255,255,255,.15);
+          box-shadow: 0 8px 30px rgba(0,0,0,.35);
+          border-radius: 16px;
+        }
+        .neon{ position: relative; }
+        .neon::before{
+          content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px;
+          background: linear-gradient(120deg, rgb(var(--neon-b)) 0%, rgb(var(--neon-a)) 50%, rgb(var(--neon-b)) 100%);
+          -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor; mask-composite: exclude;
+          pointer-events: none; filter: drop-shadow(0 0 8px rgba(var(--neon-a),.35));
+        }
+        .glass-strong { --glass-alpha: .16; --glass-blur: 22px; }
+        .glass-subtle { --glass-alpha: .30; --glass-blur: 12px; }
 
-        /* Form Input Focus Glow */
+        /* === Base & Typography ============================ */
+        body{
+            margin:0; min-height:100dvh; color:#F5F5F7; 
+            background:radial-gradient(1200px 600px at 10% -10%, #1e293b 0%, #0b0e11 60%), url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1600&auto=format&fit=crop') center/cover fixed; 
+            background-blend-mode:overlay; 
+            font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+            overflow: hidden;
+        }
+        h1, h2, h3{
+            margin: 0;
+            font-family: Orbitron, system-ui, sans-serif;
+            font-weight: 700;
+            color: #F5F5F7;
+            text-shadow: 0 0 8px rgba(var(--neon-b), .5);
+        }
+        h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 0.5rem; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.25rem; }
+
+        /* === UI Components ============================ */
         .form-input {
-            background-color: #282828; /* Slightly lighter dark grey for inputs */
-            border-color: var(--border-color);
-            color: #E0E0E0;
+            background: rgba(var(--glass-bg-rgb), 0.4);
+            border: 1px solid rgba(255,255,255,.15);
+            color: #F5F5F7;
             transition: all 0.2s ease-in-out;
-            border-radius: 0.5rem; /* Tailwind 'rounded-lg' */
+            border-radius: 8px;
         }
         .form-input:focus {
             outline: none;
-            border-color: var(--neon-green);
-            box-shadow: 0 0 0 3px rgba(0, 255, 140, 0.3), 0 0 10px var(--neon-green); /* Neon green focus glow */
+            border-color: rgb(var(--neon-b));
+            box-shadow: 0 0 0 3px rgba(var(--neon-b), 0.3), 0 0 10px rgb(var(--neon-b));
         }
 
-        /* Modal Transitions */
-        .modal-backdrop { transition: opacity 0.3s ease-in-out; }
-        .modal-content { transition: transform 0.3s ease-in-out; }
-
-        /* Resizable Menu Handle */
-        #resize-handle {
-            width: 5px;
-            cursor: col-resize;
-            background-color: #4a5568; /* Dark grey for visibility */
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-        }
-        nav:hover #resize-handle { opacity: 1; }
-        .is-resizing { user-select: none; } /* Disable text selection during resize */
-
-        /* Tabs Styling */
         .tab {
-            border-color: transparent; /* Default transparent border */
-            color: #A0A0A0; /* Lighter grey for inactive tabs */
+            border-color: transparent;
+            color: #A9B1D6;
             transition: all 0.2s ease-in-out;
-            border-radius: 0.25rem 0.25rem 0 0; /* Rounded top corners */
+            border-radius: 8px 8px 0 0;
         }
         .tab.active {
-            border-color: var(--neon-blue); /* Neon border for active tab */
-            background-color: var(--neon-blue); /* Neon background for active tab */
-            color: black !important; /* Black text for active tab to stand out */
-            font-weight: 600; /* Bolder text for active tab */
-            text-shadow: 0 0 8px rgba(0, 0, 0, 0.3); /* Subtle text shadow for depth */
-            box-shadow: 0 0 15px var(--neon-blue); /* Overall tab glow */
+            background: linear-gradient(120deg, rgba(var(--neon-b), .15), rgba(var(--neon-a), .15));
+            border-color: rgb(var(--neon-b));
+            color: #fff !important;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(var(--neon-b), 0.5);
+            box-shadow: 0 -4px 15px rgba(var(--neon-b), .2);
         }
         .tab:not(.active):hover {
-            color: var(--neon-blue); /* Neon color on hover for inactive tabs */
-            border-color: var(--neon-blue);
-            text-shadow: 0 0 5px var(--neon-blue);
+            color: rgb(var(--neon-b));
+            background: rgba(var(--neon-b), .1);
         }
 
-        /* Semi-Transparent Cards & Modals with Neon Borders */
-        .neon-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--neon-blue); /* Neon border */
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); /* Soft neon glow for cards */
-        }
-
-        /* Menu Link Styling */
-        .menu-entry {
-            transition: all 0.2s ease-in-out;
-            border-left: 3px solid transparent; /* For hover effect */
-        }
-        .menu-entry:hover {
-            background-color: rgba(0, 240, 255, 0.2); /* Semi-transparent neon blue hover */
-            border-left: 3px solid var(--neon-blue);
-        }
-        .menu-entry:hover .link-text {
-            text-shadow: 0 0 8px var(--neon-blue); /* Text glow on hover */
-        }
-        
-        /* Heading Colors & Glow */
-        h1, h2, h3 {
-            color: var(--neon-blue); /* Neon blue for main headings */
-            text-shadow: 0 0 10px var(--neon-blue);
-        }
-
-        /* Button Styling */
         .btn-primary {
-            background-color: var(--neon-blue); /* Default button color */
-            color: black; /* Black text on neon buttons */
-            font-weight: 600;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
-        }
-        .btn-primary:hover {
-            background-color: var(--neon-green); /* Hover effect to another neon color */
-            box-shadow: 0 0 15px rgba(0, 255, 140, 0.7);
-        }
-        .btn-danger {
-            background-color: var(--neon-pink); /* Delete button in pink neon */
+            background: rgb(var(--neon-b));
             color: black;
             font-weight: 600;
-            box-shadow: 0 0 10px rgba(255, 0, 191, 0.5);
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 0 10px rgba(var(--neon-b), 0.5);
+            border: none;
+            border-radius: 8px;
+        }
+        .btn-primary:hover {
+            background: rgb(var(--neon-a));
+            box-shadow: 0 0 15px rgba(var(--neon-a), 0.7);
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
         }
         .btn-danger:hover {
-            background-color: #FF55CC; /* Slightly brighter pink on hover */
-            box-shadow: 0 0 15px rgba(255, 0, 191, 0.7);
+            background: #c53030;
+            box-shadow: 0 0 15px rgba(197, 48, 48, 0.7);
         }
-        
         .btn-secondary {
-            background-color: #4A5568;
-            color: #E0E0E0;
+            background: rgba(var(--glass-bg-rgb), 0.5);
+            border: 1px solid rgba(255,255,255,.15);
+            color: #F5F5F7;
+            border-radius: 8px;
             transition: background-color 0.2s ease-in-out;
         }
         .btn-secondary:hover {
-            background-color: #64748b;
+            background: rgba(var(--glass-bg-rgb), 0.8);
         }
-        
-        /* Quick Goto Orb */
+
+        /* === App Specifics ============================ */
+        main { background: transparent !important; }
+        .menu-entry:hover {
+            background-color: rgba(var(--neon-b), 0.1);
+            border-left-color: rgb(var(--neon-b));
+        }
         #glowing-orb {
-            background: radial-gradient(circle, #00F0FF, #121212 60%);
-            box-shadow: 0 0 15px #00F0FF, 0 0 30px #00F0FF, inset 0 0 10px #00F0FF;
+            background: radial-gradient(circle, rgb(var(--neon-b)), rgba(var(--glass-bg-rgb), 0.1) 60%);
+            box-shadow: 0 0 15px rgb(var(--neon-b)), 0 0 30px rgb(var(--neon-b)), inset 0 0 10px rgb(var(--neon-b)));
             animation: orb-pulse 2s infinite alternate;
         }
         @keyframes orb-pulse {
-          from { transform: scale(1); box-shadow: 0 0 15px #00F0FF, 0 0 30px #00F0FF, inset 0 0 10px #00F0FF; }
-          to { transform: scale(1.05); box-shadow: 0 0 25px #BF00FF, 0 0 50px #BF00FF, inset 0 0 15px #BF00FF; }
+          from { transform: scale(1); box-shadow: 0 0 15px rgb(var(--neon-b)), 0 0 30px rgb(var(--neon-b)), inset 0 0 10px rgb(var(--neon-b))); }
+          to { transform: scale(1.05); box-shadow: 0 0 25px rgb(var(--neon-a)), 0 0 50px rgb(var(--neon-a)), inset 0 0 15px rgb(var(--neon-a))); }
         }
-
-        #quick-goto-submenu {
-            background-color: rgba(30, 30, 30, 0.9);
-            border: 1px solid var(--neon-blue);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-        }
-
-        /* Instruction Panel */
-        #instruction-panel {
-            background-color: rgba(20, 20, 20, 0.95);
-            backdrop-filter: blur(10px);
-            border-left: 1px solid var(--neon-pink);
-            box-shadow: -10px 0 20px rgba(255, 0, 191, 0.2);
+        .is-resizing { user-select: none; }
+        #resize-handle {
+            width: 5px; cursor: col-resize; background-color: transparent;
+            position: absolute; top: 0; right: 0; bottom: 0; z-index: 10;
         }
     </style>
 </head>

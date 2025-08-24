@@ -8,5 +8,6 @@ export const STORE_NAMES = {
     notepad: 'notepad',
     instructions: 'instructions',
     endpoints: 'endpoints',
-    openai_config: 'openai_config'
+    openai_config: 'openai_config',
+    images: 'images'
 };
