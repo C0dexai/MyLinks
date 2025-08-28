@@ -86,11 +86,14 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ links, onLinkNavigate, onEdit, onDe
             <a
                 href="#"
                 onClick={(e) => { e.preventDefault(); onLinkNavigate(link); }}
-                title={link.description}
+                title={`${link.description} - Visits: ${link.visitCount || 0}`}
                 className="flex items-center overflow-hidden flex-grow cursor-pointer"
             >
                 <img src={link.imageUrl || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='} alt={link.description} className="flex-shrink-0 w-8 h-8 object-cover rounded-md bg-gray-700" />
-                <span className="link-text font-medium whitespace-nowrap overflow-hidden ml-3 text-gray-200">{link.description}</span>
+                <div className="flex-grow flex items-center justify-between ml-3 overflow-hidden">
+                    <span className="link-text font-medium whitespace-nowrap overflow-hidden text-ellipsis text-gray-200">{link.description}</span>
+                    <span className="ml-2 flex-shrink-0 text-xs font-mono bg-gray-700 text-neon-purple rounded-full px-2 py-0.5">{link.visitCount || 0}</span>
+                </div>
             </a>
             <div className="flex items-center space-x-1 flex-shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button onClick={() => onEdit(link.id)} className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-gray-600">{icons.edit}</button>

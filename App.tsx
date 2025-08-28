@@ -8,6 +8,8 @@ import AddLinkView from './views/AddLinkView';
 import PagesView from './views/PagesView';
 import TodoView from './views/TodoView';
 import NotepadView from './views/NotepadView';
+import ImageGenView from './views/ImageGenView';
+import SearchView from './views/SearchView';
 import AIConsoleView from './views/AIConsoleView';
 import ConnectView from './views/ConnectView';
 import RankingsView from './views/RankingsView';
@@ -28,6 +30,7 @@ const App: React.FC = () => {
     const [editingCategory, setEditingCategory] = useState<'informative' | 'development'>('informative');
     const [urlInputValue, setUrlInputValue] = useState('');
     const [isInstructionPanelOpen, setInstructionPanelOpen] = useState(false);
+    const [isIframeLoading, setIsIframeLoading] = useState(false);
 
 
     const { data: links, addData: addLink, updateData: updateLink, deleteData: deleteLink, getData: getLink } = useIndexedDB<Link>(STORE_NAMES.links);
@@ -39,6 +42,9 @@ const App: React.FC = () => {
     const { data: storedImages, addData: addStoredImage } = useIndexedDB<StoredImage>(STORE_NAMES.images);
 
     const switchView = (view: View, url?: string) => {
+        if (view !== View.Iframe) {
+            setIsIframeLoading(false);
+        }
         setActiveView(view);
         if (view === View.Iframe && url) {
             setIframeUrl(url);
@@ -52,6 +58,7 @@ const App: React.FC = () => {
             if (!/^(https?:\/\/)/i.test(fullUrl)) {
                 fullUrl = `https://${fullUrl}`;
             }
+            setIsIframeLoading(true);
             switchView(View.Iframe, fullUrl);
         }
     };
@@ -79,6 +86,7 @@ const App: React.FC = () => {
     };
 
     const handleLinkNavigate = async (link: Link) => {
+        setIsIframeLoading(true);
         if (link.id !== undefined) {
             const linkToUpdate = await getLink(link.id);
             if (linkToUpdate) {
@@ -102,10 +110,12 @@ const App: React.FC = () => {
         { id: View.Pages, label: 'Pages', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg> },
         { id: View.Todo, label: 'Todo List', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="m9 14 2 2 4-4"></path></svg> },
         { id: View.Notepad, label: 'Notepad', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> },
+        { id: View.ImageGen, label: 'Image Gen', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.3 15.7c.3.3.3.8 0 1.1l-2.8 2.8c-.3.3-.8.3-1.1 0l-1.5-1.5-1.4-1.4c-.2-.2-.2-.5 0-.7l4.2-4.2c.2-.2.5-.2.7 0l2 .1c.2 0 .3.2.3.3v1.5c0 .3-.1.5-.3.7l-1.6 1.6 -1.2 1.2z"/><path d="M12 22a7 7 0 0 1-7-7c0-2.2 1-4.2 2.5-5.5C8.9 8 10.3 7 12 7a7 7 0 0 1 7 7c0 .8-.2 1.5-.4 2.2"/><path d="M20 2c-1 .5-2 1.3-2.6 2.4"/><path d="M16 6c-.5 1-1.3 2-2.4 2.6"/><path d="M4 14c.6-1.2 1.5-2.2 2.6-2.8"/><path d="M7 21a6.8 6.8 0 0 1-1.3-4.4c0-1.2.3-2.4.9-3.5"/></svg> },
+        { id: View.Search, label: 'Search', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> },
+        { id: View.Rankings, label: 'Rankings', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg> },
         { id: View.AIConsole, label: 'AI Console', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg> },
         { id: View.Inference, label: 'Inference', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> },
         { id: View.Connect, label: 'Connect', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> },
-        { id: View.Rankings, label: 'Rankings', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg> },
     ];
     
     const iconNavItems = [
@@ -175,9 +185,36 @@ const App: React.FC = () => {
                 <div className="flex-grow relative overflow-y-auto">
                     {activeView === View.AddLink && <AddLinkView onAddLink={addLink} />}
                     {activeView === View.Pages && <PagesView storedImages={storedImages || []} onAddImage={addStoredImage} />}
-                    {activeView === View.Iframe && <iframe src={iframeUrl || defaultIframeDataUrl} className="w-full h-full border-0" title="Content Frame"></iframe>}
+                    {activeView === View.Iframe && (
+                        <div className="relative w-full h-full">
+                            {isIframeLoading && (
+                                <div className="absolute inset-0 z-10 flex items-center justify-center bg-[rgba(11,14,17,0.7)] backdrop-blur-sm transition-opacity duration-300">
+                                    <div className="w-16 h-16 rounded-full animate-spin"
+                                         style={{
+                                             border: '4px solid rgba(var(--neon-b), 0.2)',
+                                             borderTopColor: 'rgb(var(--neon-b))',
+                                             boxShadow: '0 0 15px rgba(var(--neon-b), 0.5)'
+                                         }}>
+                                    </div>
+                                </div>
+                            )}
+                            <iframe 
+                                src={iframeUrl || defaultIframeDataUrl} 
+                                className={`w-full h-full border-0 transition-opacity duration-300 ${isIframeLoading ? 'opacity-50' : 'opacity-100'}`}
+                                title="Content Frame"
+                                onLoad={() => setIsIframeLoading(false)}
+                            />
+                        </div>
+                    )}
                     {activeView === View.Todo && <TodoView todos={todos || []} onAddTodo={addTodo} onUpdateTodo={updateTodo} onDeleteTodo={deleteTodo} />}
                     {activeView === View.Notepad && <NotepadView notepad={notepad?.[0]} onUpdateNotepad={updateNotepad} />}
+                    {activeView === View.ImageGen && <ImageGenView onAddImage={addStoredImage} />}
+                    {activeView === View.Search && <SearchView 
+                        links={links || []}
+                        todos={todos || []}
+                        notepad={notepad?.[0]}
+                        onNavigate={switchView}
+                    />}
                     {activeView === View.AIConsole && <AIConsoleView />}
                     {activeView === View.Connect && <ConnectView 
                         links={links}

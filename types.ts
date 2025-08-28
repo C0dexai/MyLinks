@@ -50,6 +50,8 @@ export enum View {
     Iframe = 'content-frame',
     Todo = 'todo-view',
     Notepad = 'notepad-view',
+    ImageGen = 'image-gen-view',
+    Search = 'search-view',
     AIConsole = 'ai-console-view',
     Connect = 'connect-view',
     Inference = 'inference-view',

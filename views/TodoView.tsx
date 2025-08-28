@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Todo } from '../types';
+import Modal from '../components/Modal';
 
 type KanbanStatus = 'todo' | 'in-progress' | 'done';
 
@@ -23,12 +24,27 @@ interface TodoViewProps {
 const TodoView: React.FC<TodoViewProps> = ({ todos, onAddTodo, onUpdateTodo, onDeleteTodo }) => {
     const [newTodoText, setNewTodoText] = useState('');
     const [dragOverColumn, setDragOverColumn] = useState<KanbanStatus | null>(null);
+    const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (newTodoText.trim()) {
             onAddTodo({ text: newTodoText.trim(), status: 'todo' });
             setNewTodoText('');
+        }
+    };
+
+    const handleDeleteClick = (todo: Todo) => {
+        setDeletingTodo(todo);
+        setDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (deletingTodo) {
+            await onDeleteTodo(deletingTodo.id);
+            setDeleteModalOpen(false);
+            setDeletingTodo(null);
         }
     };
 
@@ -107,7 +123,7 @@ const TodoView: React.FC<TodoViewProps> = ({ todos, onAddTodo, onUpdateTodo, onD
                                 >
                                     <p className="text-gray-200">{todo.text}</p>
                                     <button
-                                        onClick={() => onDeleteTodo(todo.id)}
+                                        onClick={() => handleDeleteClick(todo)}
                                         className="absolute top-1 right-1 p-1 text-gray-500 hover:text-neon-pink transition-opacity opacity-0 group-hover:opacity-100"
                                         aria-label="Delete task"
                                     >
@@ -119,6 +135,27 @@ const TodoView: React.FC<TodoViewProps> = ({ todos, onAddTodo, onUpdateTodo, onD
                     </div>
                 ))}
             </div>
+
+            {isDeleteModalOpen && deletingTodo && (
+                <Modal
+                    title="Confirm Deletion"
+                    isOpen={isDeleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                >
+                    <div>
+                        <p className="text-gray-400 mt-2">
+                            Are you sure you want to delete this task? This action cannot be undone.
+                        </p>
+                        <p className="text-white bg-gray-900/50 p-3 rounded-md mt-4 border border-gray-700">
+                           "{deletingTodo.text}"
+                        </p>
+                        <div className="mt-6 flex justify-end space-x-3">
+                            <button onClick={() => setDeleteModalOpen(false)} className="px-4 py-2 btn-secondary">Cancel</button>
+                            <button onClick={handleConfirmDelete} className="px-4 py-2 btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 };
